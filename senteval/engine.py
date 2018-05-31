@@ -23,6 +23,8 @@ from senteval.sst import SSTEval
 from senteval.rank import ImageCaptionRetrievalEval
 from senteval.probing import *
 
+import functools
+
 class SE(object):
     def __init__(self, params, batcher, prepare=None):
         # parameters
@@ -116,8 +118,8 @@ class SE(object):
                 self.evaluation = CoordinationInversionEval(tpath + '/probing', seed=self.params.seed)
 
         self.params.current_task = name
-        self.evaluation.do_prepare(self.params, self.prepare)
+        self.evaluation.do_prepare(self.params, functools.partial(self.prepare, name=name))
 
-        self.results = self.evaluation.run(self.params, self.batcher)
+        self.results = self.evaluation.run(self.params, functools.partial(self.batcher, name=name))
 
         return self.results
